@@ -1,7 +1,7 @@
-sg_scheme: internet-facing
+sg_scheme: internal
 sg_rules:
-- port: 80
-  instancePort: 80
+- port: 8000
+  instancePort: 8000
   protocol: http
 sg_internal_cidrs:
 - "10.201.0.0/17"
