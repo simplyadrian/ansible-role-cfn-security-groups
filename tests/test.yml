@@ -1,0 +1,18 @@
+---
+- name: test stack creation
+  hosts: test
+  vars:
+    elb_role_stack_name: "ansible-role-cfn-elb-testing"
+    elb_vpc: "YOUR-VPC-ID-HERE"
+    elb_subnets: "YOUR-SUBNET-ID-HERE,ANOTHER-SUBNET-ID-YOLO"
+    elb_sg_ids: "YOUR-SG-ID,MOAR-SG-ID"
+  roles:
+    - ansible-role-cfn-elb
+
+- name: test stack removal
+  hosts: test
+  vars:
+    elb_role_stack_name: "ansible-role-cfn-elb-testing"
+    elb_role_stack_state: "absent"
+  roles:
+    - ansible-role-cfn-elb
