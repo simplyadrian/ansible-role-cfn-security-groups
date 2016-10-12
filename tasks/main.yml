@@ -19,3 +19,6 @@
     region: "{{ region|default('us-west-2') }}"
     security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
     tags: "{{ sg_tags }}"
+  register: sg_outputs
+
+- debug: var=sg_outputs
