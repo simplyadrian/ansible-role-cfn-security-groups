@@ -1,0 +1,77 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Long lived security groups for {{ sg_name | default('something...presumably') }}",
+  "Parameters": {
+    "VPC" : {
+      "Type" : "AWS::EC2::VPC::Id"
+    }
+  },
+  "Resources": {
+    "SecurityGroup": {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Ref" : "VPC" },
+        "GroupDescription": "Resources in this security group are allowed to connect to instances in the corresponding BackendSecurityGroup in this stack",
+        "SecurityGroupIngress": [
+        {# allow connections on each defined InstancePort #}
+        {% if sg_scheme == 'internal' %}{# each internal cidr assigned to each port, for internal security groups #}
+        {% for rules in sg_rules %}
+        {% for cidr in sg_internal_cidrs %}
+        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ cidr }}" } {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% else %}{# rules allowed from 0.0.0.0/0, for internet-facing Security Groups #}
+        {% for rules in sg_rules %}
+        {% if sg_source|default(['0.0.0.0/0']) %}
+        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ sg_source | default('0.0.0.0/0')}}" } {% if not loop.last %}, {% endif %}
+        {% endif %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+        ]
+      }
+    },
+    "BackendSecurityGroup": {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Ref" : "VPC" },
+        "GroupDescription": "Instances in this security group allow connections from the corresponding SecurityGroup; it should be applied to backend services",
+        "SecurityGroupIngress": [
+        {# allow connections from SecurityGroup on each InstancePort listed #}
+        {% for rules in sg_rules %}
+          {
+            "FromPort": "{{ rules.instancePort }}",
+            "ToPort": "{{ rules.instancePort }}",
+            "IpProtocol": "tcp",
+            "SourceSecurityGroupId": { "Ref": "SecurityGroup" }
+          }{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        ]
+      }
+    },
+    {# finally, create an egress rule for each rule, this is a separate resource because the security groups are inter-dependent #}
+    {% for rules in sg_rules %}
+      "EgressSecurityGroup{{rules.port}}to{{rules.instancePort}}": {
+        "Type": "AWS::EC2::SecurityGroupEgress",
+        "Properties": {
+          "GroupId": { "Ref": "SecurityGroup" },
+          "IpProtocol": "tcp",
+          "FromPort": "{{ rules.instancePort }}",
+          "ToPort": "{{ rules.instancePort }}",
+          "DestinationSecurityGroupId": { "Ref": "BackendSecurityGroup" }
+        }
+      }
+    {% endfor %}
+  },
+  "Outputs": {
+    "FrontendSecurityGroupId": {
+    "Description": "Add frontends to this security group to allow access from the backend security groups",
+    "Value": {"Ref": "BackendSecurityGroup"}
+    },
+    "BackendSecurityGroupId": {
+    "Description": "Add backends to this security group to allow access from the frontend security groups",
+    "Value": {"Ref": "SecurityGroup"}
+    }
+  }
+}

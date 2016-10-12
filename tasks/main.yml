@@ -1,0 +1,21 @@
+# tasks file for ansible-role-cfn-security-groups
+- name: Create build directory
+  file:
+    dest: build
+    state: directory
+
+- name: Template role
+  template:
+    src: sg.json.j2
+    dest: "build/{{sg_role_stack_name}}.json"
+
+- name: Create or remove role stack
+  cloudformation:
+    template_parameters:
+      VPC: "{{ sg_vpc|default(omit) }}"
+    template: "build/{{sg_role_stack_name}}.json"
+    stack_name: "{{ sg_role_stack_name }}"
+    state: "{{ sg_role_stack_state|default('present') }}"
+    region: "{{ region|default('us-west-2') }}"
+    security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
+    tags: "{{ sg_tags }}"

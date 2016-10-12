@@ -1,0 +1,9 @@
+sg_scheme: internet-facing
+sg_rules:
+- port: 8000
+  instancePort: 8000
+  protocol: http
+sg_internal_cidrs:
+- "10.201.0.0/17"
+region: us-west-2
+sg_tags: {}
