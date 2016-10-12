@@ -67,11 +67,11 @@
   "Outputs": {
     "FrontendSecurityGroupId": {
     "Description": "Add frontends to this security group to allow access from the backend security groups",
-    "Value": {"Ref": "BackendSecurityGroup"}
+    "Value": {"Ref": "SecurityGroup"}
     },
     "BackendSecurityGroupId": {
     "Description": "Add backends to this security group to allow access from the frontend security groups",
-    "Value": {"Ref": "SecurityGroup"}
+    "Value": {"Ref": "BackendSecurityGroup"}
     }
   }
 }
