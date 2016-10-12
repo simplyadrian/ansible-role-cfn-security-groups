@@ -23,9 +23,9 @@
         {% endfor %}
         {% else %}{# rules allowed from 0.0.0.0/0, for internet-facing Security Groups #}
         {% for rules in sg_rules %}
-        {% for source in rules.sources|default(['0.0.0.0/0']) %}
-        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ rules.source | default('0.0.0.0/0')}}" } {% if not loop.last %}, {% endif %}
-        {% endfor %}
+        {% if sg_source|default(['0.0.0.0/0']) %}
+        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ sg_source | default('0.0.0.0/0')}}" } {% if not loop.last %}, {% endif %}
+        {% endif %}
         {% if not loop.last %}, {% endif %}
         {% endfor %}
         {% endif %}

@@ -1,4 +1,4 @@
-sg_scheme: internal
+sg_scheme: internet-facing
 sg_rules:
 - port: 8000
   instancePort: 8000

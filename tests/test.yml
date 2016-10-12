@@ -1,9 +1,9 @@
 ---
-- name: test stack creation
+- name: test internal stack creation
   hosts: test
   vars:
     sg_role_stack_name: "ansible-role-cfn-security-groups-testing"
-    sg_vpc: "vpc-fa3aca9e" #"YOUR-VPC-ID-HERE"
+    sg_vpc: #"YOUR-VPC-ID-HERE"
     sg_scheme: "internal"
     vpc_ip_cidr: "10.201.0.0/17"
     vpn_ip_cidr: "10.0.0.0/8"
@@ -21,10 +21,34 @@
   roles:
     - ansible-role-cfn-security-groups
 
-- name: test stack removal
+- name: test internal stack removal
   hosts: test
   vars:
     sg_role_stack_name: "ansible-role-cfn-security-groups-testing"
+    sg_role_stack_state: "absent"
+  roles:
+    - ansible-role-cfn-security-groups
+
+- name: test external stack creation
+  hosts: test
+  vars:
+    sg_role_stack_name: "ansible-role-cfn-external-security-groups-testing"
+    sg_vpc: #"YOUR-VPC-ID-HERE"
+    application_port: 9000
+    vpc_ip_cidr: "10.201.0.0/17"
+    sg_source: "{{ vpc_ip_cidr }}"
+    sg_rules:
+      - protocol: tcp
+        port: "{{ application_port }}"
+        instance_protocol: tcp
+        instancePort: "{{ application_port }}"
+  roles:
+    - ansible-role-cfn-security-groups
+
+- name: test internal stack removal
+  hosts: test
+  vars:
+    sg_role_stack_name: "ansible-role-cfn-external-security-groups-testing"
     sg_role_stack_state: "absent"
   roles:
     - ansible-role-cfn-security-groups
