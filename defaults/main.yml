@@ -5,6 +5,5 @@ sg_rules:
   protocol: http
 sg_internal_cidrs:
 - "10.201.0.0/17"
-sg_ids: {}
 region: us-west-2
 sg_tags: {}

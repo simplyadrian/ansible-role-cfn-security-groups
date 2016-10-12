@@ -4,10 +4,6 @@
   "Parameters": {
     "VPC" : {
       "Type" : "AWS::EC2::VPC::Id"
-    },
-    "SecurityGroupIDs" : {
-      "Type": "List<AWS::EC2::SecurityGroup::Id>",
-      "Description" : "SecurityGroupIDs to add to cluster hosts"
     }
   },
   "Resources": {
@@ -25,11 +21,6 @@
         {% endfor %}
         {% if not loop.last %}, {% endif %}
         {% endfor %}
-        {% elif %}{# rules allowed from defined SecurityGroupIDs #}
-        {% for rules in sg_rules %}
-        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "SourceSecurityGroupId": { "Ref" : "SecurityGroupIDs" } } {% if not loop.last %}, {% endif %}
-        {% endfor %}
-        {% if not loop.last %}, {% endif %}
         {% else %}{# rules allowed from 0.0.0.0/0, for internet-facing Security Groups #}
         {% for rules in sg_rules %}
         {% for source in rules.sources|default(['0.0.0.0/0']) %}

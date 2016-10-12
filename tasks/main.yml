@@ -13,7 +13,6 @@
   cloudformation:
     template_parameters:
       VPC: "{{ sg_vpc|default(omit) }}"
-      SecurityGroupIDs: "{{ sg_ids|default(omit) }}"
     template: "build/{{sg_role_stack_name}}.json"
     stack_name: "{{ sg_role_stack_name }}"
     state: "{{ sg_role_stack_state|default('present') }}"
