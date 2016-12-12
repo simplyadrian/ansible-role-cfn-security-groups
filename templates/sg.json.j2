@@ -16,9 +16,11 @@
         {# allow connections on each defined InstancePort #}
         {% if sg_scheme == 'internal' %}{# each internal cidr assigned to each port, for internal security groups #}
         {% for rules in sg_rules %}
+        {% if sg_internal_cidrs is defined %}
         {% for cidr in sg_internal_cidrs %}
         { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ cidr }}" } {% if not loop.last %}, {% endif %}
         {% endfor %}
+        {% endif  %}
         {% if not loop.last %}, {% endif %}
         {% endfor %}
         {% else %}{# rules allowed from 0.0.0.0/0, for internet-facing Security Groups #}
