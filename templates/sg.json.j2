@@ -49,6 +49,26 @@
             "SourceSecurityGroupId": { "Ref": "SecurityGroup" }
           }{% if not loop.last %}, {% endif %}
         {% endfor %}
+        {# allow connections on each defined InstancePort #}
+        {% if sg_backend_rules is defined %}
+        {% if sg_scheme == 'internal' %}{# each internal cidr assigned to each port, for internal security groups #}
+        {% for rules in sg_backend_rules %}
+        {% if sg_backend_internal_cidrs is defined %}
+        {% for cidr in sg_backend_internal_cidrs %}
+        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ cidr }}" } {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif  %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% else %}{# rules allowed from 0.0.0.0/0, for internet-facing Security Groups #}
+        {% for rules in sg_backend_rules %}
+        {% if sg_backend_source|default(['0.0.0.0/0']) %}
+        { "FromPort": "{{ rules.port }}", "ToPort": "{{ rules.port }}", "IpProtocol": "tcp", "CidrIp": "{{ sg_source | default('0.0.0.0/0')}}" } {% if not loop.last %}, {% endif %}
+        {% endif %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endif %}
         ]
       }
     },
