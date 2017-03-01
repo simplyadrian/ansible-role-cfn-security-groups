@@ -51,6 +51,7 @@
         {% endfor %}
         {# allow connections on each defined InstancePort #}
         {% if sg_backend_rules is defined %}
+        ,
         {% if sg_scheme == 'internal' %}{# each internal cidr assigned to each port, for internal security groups #}
         {% for rules in sg_backend_rules %}
         {% if sg_backend_internal_cidrs is defined %}
