@@ -1,0 +1,20 @@
+- name: test internal stack creation
+  hosts: test
+  vars:
+    sg_role_stack_name: "ansible-role-cfn-security-groups-testing"
+    sg_scheme: "internal"
+    vpc_ip_cidr: "10.201.0.0/17"
+    vpn_ip_cidr: "10.0.0.0/8"
+    local_ip_cidr: "192.168.0.0/16"
+    application_port: 9000
+    sg_rules:
+      - protocol: tcp
+        port: "{{ application_port }}"
+        instance_protocol: tcp
+        instancePort: "{{ application_port }}"
+    sg_internal_cidrs:
+      - "{{ vpc_ip_cidr }}"
+      - "{{ vpn_ip_cidr }}"
+      - "{{ local_ip_cidr }}"
+  roles:
+    - ansible-role-cfn-security-groups
