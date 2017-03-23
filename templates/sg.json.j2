@@ -74,17 +74,19 @@
       }
     },
     {# finally, create an egress rule for each rule, this is a separate resource because the security groups are inter-dependent #}
+
     {% for rules in sg_rules %}
-      "EgressSecurityGroup{{rules.port}}to{{rules.instancePort}}": {
-        "Type": "AWS::EC2::SecurityGroupEgress",
-        "Properties": {
-          "GroupId": { "Ref": "SecurityGroup" },
-          "IpProtocol": "tcp",
-          "FromPort": "{{ rules.instancePort }}",
-          "ToPort": "{{ rules.instancePort }}",
-          "DestinationSecurityGroupId": { "Ref": "BackendSecurityGroup" }
-        }
+    "EgressSecurityGroup{{rules.port}}to{{rules.instancePort}}": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": { "Ref": "SecurityGroup" },
+        "IpProtocol": "tcp",
+        "FromPort": "{{ rules.instancePort }}",
+        "ToPort": "{{ rules.instancePort }}",
+        "DestinationSecurityGroupId": { "Ref": "BackendSecurityGroup" }
       }
+    }
+    {% if not loop.last %}, {% endif %}
     {% endfor %}
   },
   "Outputs": {

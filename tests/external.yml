@@ -1,0 +1,14 @@
+- name: test external stack creation
+  hosts: test
+  vars:
+    sg_role_stack_name: "ansible-role-cfn-external-security-groups-testing"
+    application_port: 9000
+    vpc_ip_cidr: "10.201.0.0/17"
+    sg_source: "{{ vpc_ip_cidr }}"
+    sg_rules:
+      - protocol: tcp
+        port: "{{ application_port }}"
+        instance_protocol: tcp
+        instancePort: "{{ application_port }}"
+  roles:
+    - ansible-role-cfn-security-groups

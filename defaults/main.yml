@@ -1,7 +1,8 @@
 sg_scheme: internet-facing
 sg_rules:
-- port: 8000
-  instancePort: 8000
-  protocol: http
+  - port: 8000
+    instancePort: 8000
+    protocol: http
 region: us-west-2
 sg_tags: {}
+sg_stack_state: present
